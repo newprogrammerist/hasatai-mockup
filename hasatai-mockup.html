@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HasatAI · Akıllı Tarım Yönetim Platformu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+/* =========================================================
+   HasatAI · Premium Tasarım Sistemi
+   Koyu zümrüt yeşili + altın aksanlar + cam efektleri
+   ========================================================= */
+
+:root {
+  /* Marka — derin orman yeşili */
+  --brand-50:  #ecf6ef;
+  --brand-100: #cfe6d6;
+  --brand-200: #a5d3b1;
+  --brand-300: #6db585;
+  --brand-400: #3f9a5e;
+  --brand-500: #2a7d47;
+  --brand-600: #1e6238;
+  --brand-700: #174a2c;
+  --brand-800: #103420;
+  --brand-900: #0a2316;
+  --brand-950: #051509;
+
+  /* Altın aksan — premium his */
+  --gold-300: #e9d28f;
+  --gold-400: #d4b85f;
+  --gold-500: #b89a3f;
+  --gold-600: #8f7528;
+
+  /* Toprak */
+  --earth-300: #cdb38a;
+  --earth-500: #8a6a3f;
+  --earth-700: #5a4226;
+
+  /* Sky */
+  --sky-300: #8cc6e5;
+  --sky-500: #3b9bc7;
+  --sky-700: #1d6691;
+
+  /* Status */
+  --success: #2a7d47;
+  --warn:    #d99320;
+  --danger:  #c8473b;
+  --info:    #3b9bc7;
+
+  /* Yüzeyler — koyu tema */
+  --bg:        #f4f1ea;          /* açık krem zemin */
+  --surface:   #ffffff;
+  --surface-2: #faf8f3;
+  --border:    #e6e1d6;
+  --border-strong: #d6d0c2;
+
+  /* Metin */
+  --text:        #14241b;
+  --text-soft:   #455349;
+  --text-muted:  #7a8580;
+  --text-on-dark: #ecf6ef;
+
+  /* Sidebar — premium koyu yeşil */
+  --side-bg:     #0a2316;
+  --side-bg-2:   #0f3022;
+  --side-text:   #c9dccf;
+  --side-muted:  #6e8779;
+  --side-active: rgba(212, 184, 95, 0.12);
+  --side-border: rgba(255,255,255,0.06);
+
+  /* Gölge */
+  --shadow-sm:  0 1px 2px rgba(10, 35, 22, 0.05);
+  --shadow:     0 4px 14px rgba(10, 35, 22, 0.08);
+  --shadow-lg:  0 18px 50px rgba(10, 35, 22, 0.16);
+  --shadow-xl:  0 30px 80px rgba(10, 35, 22, 0.22);
+
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Inter', -apple-system, system-ui, sans-serif;
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+svg { display: block; }
+img { max-width: 100%; display: block; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* =========================================================
+   LOGIN EKRANI
+   ========================================================= */
+.login-screen {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  position: relative;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(42, 125, 71, 0.95), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 80% 100%, rgba(212, 184, 95, 0.18), transparent 60%),
+    linear-gradient(180deg, #0a2316 0%, #051509 100%);
+}
+.login-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 25% 30%, rgba(255,255,255,0.04) 1px, transparent 1px),
+    radial-gradient(circle at 75% 70%, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px, 60px 60px;
+  pointer-events: none;
+}
+.login-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  min-height: 100vh;
+}
+.login-card {
+  width: 100%;
+  max-width: 460px;
+  background: linear-gradient(180deg, rgba(15, 48, 34, 0.85), rgba(10, 35, 22, 0.92));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 184, 95, 0.18);
+  border-radius: var(--radius-xl);
+  padding: 44px 40px;
+  box-shadow: var(--shadow-xl);
+  color: var(--text-on-dark);
+}
+.login-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+.brand-mark {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--gold-400) 0%, var(--brand-500) 100%);
+  display: grid; place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: #0a2316;
+  box-shadow: 0 8px 24px rgba(212, 184, 95, 0.3);
+}
+.brand-mark svg { width: 26px; height: 26px; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-text .name { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #fff; letter-spacing: -0.01em; }
+.brand-text .tag { font-size: 10px; color: var(--gold-300); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px; font-weight: 500; }
+
+.login-headline {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 38px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.login-headline em { font-style: italic; color: var(--gold-300); font-weight: 500; }
+.login-subtitle { color: rgba(236, 246, 239, 0.7); font-size: 14px; line-height: 1.6; margin-bottom: 32px; }
+
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 12px; font-weight: 500; color: rgba(236, 246, 239, 0.75); margin-bottom: 8px; letter-spacing: 0.02em; }
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.2s;
+  outline: none;
+}
+.field input::placeholder { color: rgba(236, 246, 239, 0.35); }
+.field input:focus {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--gold-400);
+  box-shadow: 0 0 0 4px rgba(212, 184, 95, 0.12);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--brand-400), var(--brand-500));
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  box-shadow: 0 8px 24px rgba(42, 125, 71, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(42, 125, 71, 0.45); }
+.btn-primary:hover::before { transform: translateX(100%); }
+.btn-primary:active { transform: translateY(0); }
+
+.login-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 28px 0 18px;
+  font-size: 11px; color: rgba(236, 246, 239, 0.4);
+  letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500;
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+
+.demo-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-pill {
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  color: rgba(236, 246, 239, 0.85);
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.demo-pill:hover { background: rgba(212, 184, 95, 0.12); border-color: var(--gold-400); color: #fff; }
+.demo-pill .role-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold-400); }
+
+/* =========================================================
+   APP LAYOUT
+   ========================================================= */
+.app { display: none; min-height: 100vh; grid-template-columns: 260px 1fr; background: var(--bg); }
+.app.is-active { display: grid; }
+
+/* SIDEBAR */
+.sidebar {
+  background: linear-gradient(180deg, var(--side-bg-2) 0%, var(--side-bg) 100%);
+  color: var(--side-text);
+  display: flex;
+  flex-direction: column;
+  position: sticky; top: 0; left: 0;
+  height: 100vh;
+  border-right: 1px solid var(--side-border);
+  z-index: 50;
+}
+.side-brand {
+  padding: 22px 22px 18px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--side-border);
+}
+.side-brand .brand-mark { width: 40px; height: 40px; font-size: 20px; border-radius: 12px; }
+.side-brand .name { font-size: 18px; }
+.side-brand .tag { font-size: 9px; }
+
+.side-section { padding: 18px 14px 8px; }
+.side-section-title {
+  font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--side-muted);
+  font-weight: 600;
+  padding: 0 10px 10px;
+}
+.side-nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--side-text);
+  font-size: 13.5px; font-weight: 500;
+  transition: all 0.15s;
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
+.nav-item.is-active {
+  background: var(--side-active);
+  color: var(--gold-300);
+  font-weight: 600;
+}
+.nav-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -14px; top: 8px; bottom: 8px;
+  width: 3px;
+  background: var(--gold-400);
+  border-radius: 0 3px 3px 0;
+}
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.85; }
+.nav-item.is-active svg { opacity: 1; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.side-user {
+  margin-top: auto;
+  padding: 14px;
+  border-top: 1px solid var(--side-border);
+}
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+}
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-400), var(--brand-400));
+  display: grid; place-items: center;
+  font-weight: 700; color: #0a2316; font-size: 13px;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-info .name { color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-info .role { color: var(--side-muted); font-size: 11px; }
+.btn-logout {
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  color: var(--side-muted);
+  transition: all 0.15s;
+}
+.btn-logout:hover { background: rgba(200, 71, 59, 0.2); color: #ff8b80; }
+.btn-logout svg { width: 16px; height: 16px; }
+
+/* MAIN */
+.main { min-width: 0; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 40;
+  backdrop-filter: blur(8px);
+}
+.topbar .menu-toggle { display: none; }
+.page-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.topbar-spacer { flex: 1; }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  transition: all 0.15s;
+  position: relative;
+}
+.icon-btn:hover { background: var(--brand-50); color: var(--brand-600); border-color: var(--brand-200); }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn .dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 8px; height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+.content { padding: 28px; flex: 1; }
+
+/* =========================================================
+   COMPONENTS — kart, kpi, badge, vs.
+   ========================================================= */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+.card:hover { box-shadow: var(--shadow); }
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.card-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+.card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.grid { display: grid; gap: 18px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-12 { grid-template-columns: repeat(12, 1fr); }
+.col-3 { grid-column: span 3; }
+.col-4 { grid-column: span 4; }
+.col-6 { grid-column: span 6; }
+.col-8 { grid-column: span 8; }
+.col-12 { grid-column: span 12; }
+
+/* KPI */
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.kpi-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--brand-50);
+  color: var(--brand-600);
+  margin-bottom: 14px;
+}
+.kpi-icon svg { width: 18px; height: 18px; }
+.kpi-icon.gold { background: rgba(212, 184, 95, 0.12); color: var(--gold-600); }
+.kpi-icon.sky  { background: rgba(59, 155, 199, 0.10); color: var(--sky-700); }
+.kpi-icon.earth { background: rgba(138, 106, 63, 0.10); color: var(--earth-700); }
+.kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.kpi-value { font-family: var(--font-display); font-size: 30px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; margin-top: 4px; }
+.kpi-trend { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; margin-top: 8px; padding: 3px 8px; border-radius: 6px; }
+.kpi-trend.up { background: rgba(42, 125, 71, 0.08); color: var(--success); }
+.kpi-trend.down { background: rgba(200, 71, 59, 0.08); color: var(--danger); }
+
+/* Hero card */
+.hero-card {
+  background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-900) 100%);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.hero-card::before {
+  content: '';
+  position: absolute; right: -80px; top: -80px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 184, 95, 0.18), transparent 70%);
+}
+.hero-card::after {
+  content: '';
+  position: absolute; left: -50px; bottom: -100px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.04), transparent 70%);
+}
+.hero-card > * { position: relative; }
+.hero-greeting { font-size: 13px; color: var(--gold-300); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 8px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.hero-title em { font-style: italic; color: var(--gold-300); font-weight: 500; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 18px; }
+.hero-meta .item { display: flex; flex-direction: column; }
+.hero-meta .item-label { font-size: 11px; color: rgba(236, 246, 239, 0.65); letter-spacing: 0.05em; text-transform: uppercase; }
+.hero-meta .item-value { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-top: 2px; }
+
+/* Badge */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.badge.success { background: rgba(42, 125, 71, 0.10); color: var(--success); }
+.badge.warn    { background: rgba(217, 147, 32, 0.12); color: var(--warn); }
+.badge.danger  { background: rgba(200, 71, 59, 0.10); color: var(--danger); }
+.badge.info    { background: rgba(59, 155, 199, 0.10); color: var(--info); }
+.badge.muted   { background: var(--surface-2); color: var(--text-muted); }
+
+/* Tablo */
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 10px 12px; letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+.table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: var(--surface-2); }
+
+/* Buton varyantları */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; transition: all 0.15s; border: 1px solid transparent; }
+.btn-solid { background: var(--brand-600); color: #fff; }
+.btn-solid:hover { background: var(--brand-700); }
+.btn-outline { background: var(--surface); border-color: var(--border); color: var(--text-soft); }
+.btn-outline:hover { background: var(--surface-2); border-color: var(--brand-300); color: var(--brand-700); }
+.btn-ghost { color: var(--text-soft); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-gold { background: linear-gradient(135deg, var(--gold-400), var(--gold-500)); color: #0a2316; font-weight: 600; }
+.btn-gold:hover { box-shadow: 0 8px 20px rgba(212, 184, 95, 0.35); }
+.btn svg { width: 14px; height: 14px; }
+
+/* Map alanı */
+.map-container { width: 100%; height: 360px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+
+/* Chart */
+.chart-box { position: relative; height: 240px; }
+.chart-box-sm { position: relative; height: 160px; }
+.chart-box-lg { position: relative; height: 320px; }
+
+/* Liste itemleri */
+.list-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.list-item:last-child { border-bottom: none; }
+.list-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--brand-50); color: var(--brand-600);
+  flex-shrink: 0;
+}
+.list-icon svg { width: 16px; height: 16px; }
+.list-icon.warn { background: rgba(217, 147, 32, 0.12); color: var(--warn); }
+.list-icon.danger { background: rgba(200, 71, 59, 0.10); color: var(--danger); }
+.list-icon.info { background: rgba(59, 155, 199, 0.10); color: var(--info); }
+.list-text { flex: 1; min-width: 0; }
+.list-title { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.list-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.list-meta { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* Sensor card */
+.sensor-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sensor-card:hover { border-color: var(--brand-300); transform: translateY(-2px); box-shadow: var(--shadow); }
+.sensor-card .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sensor-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.sensor-loc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.sensor-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--brand-50); color: var(--brand-600);
+}
+.sensor-icon svg { width: 16px; height: 16px; }
+.sensor-value { font-family: var(--font-display); font-size: 30px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+.sensor-unit { font-size: 13px; color: var(--text-muted); margin-left: 4px; font-weight: 500; }
+.sensor-bar { margin-top: 12px; height: 4px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.sensor-bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--brand-400), var(--brand-500)); border-radius: 4px; }
+
+/* Parsel kartı */
+.parcel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.parcel-card:hover { border-color: var(--brand-300); transform: translateY(-2px); box-shadow: var(--shadow); }
+.parcel-img {
+  height: 120px;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  position: relative;
+  display: grid; place-items: center;
+  color: #fff;
+}
+.parcel-img.tomato { background: linear-gradient(135deg, #c8473b, #8a2820); }
+.parcel-img.wheat { background: linear-gradient(135deg, #d4b85f, #8f7528); }
+.parcel-img.olive { background: linear-gradient(135deg, #6e7d3f, #3a4220); }
+.parcel-img.cucumber { background: linear-gradient(135deg, #5a8a3f, #2a4a20); }
+.parcel-img.corn { background: linear-gradient(135deg, #e9d28f, #b89a3f); }
+.parcel-img.grape { background: linear-gradient(135deg, #6a3a7a, #3a1a4a); }
+.parcel-img svg { width: 50px; height: 50px; opacity: 0.4; }
+.parcel-img .area-tag {
+  position: absolute; bottom: 10px; left: 10px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px; font-weight: 600;
+  color: #fff;
+}
+.parcel-info { padding: 16px; }
+.parcel-name { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text); }
+.parcel-crop { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.parcel-stats { display: flex; gap: 14px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.parcel-stat { flex: 1; }
+.parcel-stat-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
+.parcel-stat-value { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+.parcel-stat-value.success { color: var(--success); }
+.parcel-stat-value.warn { color: var(--warn); }
+.parcel-stat-value.danger { color: var(--danger); }
+
+/* Hava forecast cards */
+.weather-day {
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+}
+.weather-day .day { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.weather-day .icon { font-size: 28px; margin: 8px 0; }
+.weather-day .temp-high { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--text); }
+.weather-day .temp-low { font-size: 12px; color: var(--text-muted); }
+
+/* Görev kartı */
+.task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 0.15s;
+}
+.task-card:hover { border-color: var(--brand-300); }
+.task-checkbox {
+  width: 22px; height: 22px;
+  border: 2px solid var(--border-strong);
+  border-radius: 6px;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.task-checkbox:hover { border-color: var(--brand-500); }
+.task-checkbox.checked { background: var(--brand-500); border-color: var(--brand-500); }
+.task-checkbox.checked svg { width: 12px; height: 12px; color: #fff; }
+.task-content { flex: 1; min-width: 0; }
+.task-title { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.task-card.done .task-title { text-decoration: line-through; color: var(--text-muted); }
+.task-meta { display: flex; gap: 8px; margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+
+/* Mobil */
+.menu-toggle {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+}
+
+@media (max-width: 1100px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .col-8, .col-6, .col-4 { grid-column: span 12; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed;
+    transform: translateX(-100%);
+    width: 280px;
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-xl);
+  }
+  .sidebar.is-open { transform: translateX(0); }
+  .topbar .menu-toggle { display: grid; }
+  .content { padding: 18px; }
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .login-card { padding: 32px 24px; }
+  .login-headline { font-size: 30px; }
+  .hero-title { font-size: 24px; }
+  .hero-card { padding: 24px; }
+}
+
+/* Animasyonlar */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.4s ease-out backwards; }
+.fade-up:nth-child(1) { animation-delay: 0.05s; }
+.fade-up:nth-child(2) { animation-delay: 0.1s; }
+.fade-up:nth-child(3) { animation-delay: 0.15s; }
+.fade-up:nth-child(4) { animation-delay: 0.2s; }
+
+/* Toast */
+.toast-host { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 200; pointer-events: none; }
+.toast { background: var(--text); color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); pointer-events: auto; max-width: 360px; animation: fadeUp 0.3s ease-out; }
+.toast.success { background: var(--brand-700); }
+.toast.danger { background: var(--danger); }
+</style>
+</head>
+<body>
+
+<!-- ============= LOGIN ============= -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2 L12 12 M12 12 C 8 8, 4 10, 4 14 C 4 18, 8 18, 12 14 M12 12 C 16 8, 20 10, 20 14 C 20 18, 16 18, 12 14 M12 14 L12 22"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="name">HasatAI</span>
+          <span class="tag">Smart Agriculture</span>
+        </div>
+      </div>
+      <h1 class="login-headline">Tarlanın <em>nabzı</em><br>parmak ucunda.</h1>
+      <p class="login-subtitle">Sensör verileri, hava durumu, sulama, maliyet ve üretim — hepsi tek panelde, yapay zekâ desteğiyle.</p>
+
+      <div class="field">
+        <label for="email">E-posta</label>
+        <input type="email" id="email" placeholder="ornek@hasatai.com" value="ahmet@hasatai.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Parola</label>
+        <input type="password" id="password" placeholder="••••••••" value="demo1234" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" onclick="login()">Giriş yap</button>
+
+      <div class="login-divider">Demo kullanıcılar</div>
+      <div class="demo-pills">
+        <button class="demo-pill" onclick="quickLogin('ahmet@hasatai.com')"><span class="role-dot"></span>Ahmet · Çiftlik Sahibi</button>
+        <button class="demo-pill" onclick="quickLogin('mehmet@hasatai.com')"><span class="role-dot"></span>Mehmet · Saha Personeli</button>
+        <button class="demo-pill" onclick="quickLogin('ayse@hasatai.com')"><span class="role-dot"></span>Ayşe · Danışman</button>
+        <button class="demo-pill" onclick="quickLogin('admin@hasatai.com')"><span class="role-dot"></span>Admin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= APP ============= -->
+<div id="app" class="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <div class="side-brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2 L12 12 M12 12 C 8 8, 4 10, 4 14 C 4 18, 8 18, 12 14 M12 12 C 16 8, 20 10, 20 14 C 20 18, 16 18, 12 14 M12 14 L12 22"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="name">HasatAI</span>
+        <span class="tag">Smart Agri</span>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-section-title">Genel</div>
+      <nav class="side-nav" id="navMain"></nav>
+    </div>
+
+    <div class="side-section">
+      <div class="side-section-title">Yönetim</div>
+      <nav class="side-nav" id="navAdmin"></nav>
+    </div>
+
+    <div class="side-user">
+      <div class="user-card">
+        <div class="user-avatar" id="userAvatar">A</div>
+        <div class="user-info">
+          <div class="name" id="userName">—</div>
+          <div class="role" id="userRole">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Çıkış">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-toggle icon-btn" onclick="document.getElementById('sidebar').classList.toggle('is-open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-subtitle" id="pageSubtitle">Çiftliğine genel bakış</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Bildirimler" onclick="navigateTo('alerts')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button class="icon-btn" title="Ayarlar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="toast-host" id="toastHost"></div>
+
+<script>
+/* =========================================================
+   HasatAI · Mock veri katmanı
+   Production'da bu obje fetch('/api/...') çağrılarıyla değişecek.
+   ========================================================= */
+
+const db = {
+  users: [
+    { id: 'u1', name: 'Ahmet Yılmaz', email: 'ahmet@hasatai.com', password: 'demo1234', role: 'farm_owner', roleName: 'Çiftlik Sahibi' },
+    { id: 'u2', name: 'Mehmet Kaya',  email: 'mehmet@hasatai.com', password: 'demo1234', role: 'field_staff', roleName: 'Saha Personeli' },
+    { id: 'u3', name: 'Ayşe Demir',   email: 'ayse@hasatai.com',   password: 'demo1234', role: 'consultant',  roleName: 'Danışman' },
+    { id: 'u4', name: 'Sistem Yönetici', email: 'admin@hasatai.com', password: 'demo1234', role: 'admin', roleName: 'Yönetici' }
+  ],
+  farm: {
+    id: 'f1', name: 'Yılmaz Çiftliği', city: 'İzmir', district: 'Menemen',
+    totalAreaDa: 142.5, lat: 38.6177, lng: 27.0673
+  },
+  parcels: [
+    { id: 'p1', name: 'Domates Tarlası A', crop: 'Domates', cropClass: 'tomato', variety: 'H-2274', areaDa: 24.5, status: 'growing', planted: '2026-03-15', moisture: 42, ndvi: 0.72, lat: 38.6195, lng: 27.0658 },
+    { id: 'p2', name: 'Buğday Tarlası B', crop: 'Buğday', cropClass: 'wheat', variety: 'Trakya 2002', areaDa: 38.0, status: 'growing', planted: '2025-11-20', moisture: 28, ndvi: 0.58, lat: 38.6160, lng: 27.0712 },
+    { id: 'p3', name: 'Zeytin Bahçesi', crop: 'Zeytin', cropClass: 'olive', variety: 'Memecik', areaDa: 32.0, status: 'growing', planted: '2018-04-10', moisture: 35, ndvi: 0.65, lat: 38.6155, lng: 27.0625 },
+    { id: 'p4', name: 'Salatalık Serası', crop: 'Salatalık', cropClass: 'cucumber', variety: 'Beith Alpha', areaDa: 8.0, status: 'growing', planted: '2026-02-01', moisture: 56, ndvi: 0.81, lat: 38.6185, lng: 27.0698 },
+    { id: 'p5', name: 'Mısır Tarlası', crop: 'Mısır', cropClass: 'corn', variety: 'Pioneer 31D24', areaDa: 28.0, status: 'planning', planted: null, moisture: 18, ndvi: 0.12, lat: 38.6210, lng: 27.0680 },
+    { id: 'p6', name: 'Üzüm Bağı', crop: 'Üzüm', cropClass: 'grape', variety: 'Sultaniye', areaDa: 12.0, status: 'growing', planted: '2020-03-20', moisture: 38, ndvi: 0.68, lat: 38.6172, lng: 27.0640 }
+  ],
+  sensors: [
+    { id: 's1', parcelId: 'p1', name: 'Toprak Nem #1', type: 'soil_moisture', unit: '%', value: 42, status: 'active', battery: 78, lat: 38.6196, lng: 27.0660 },
+    { id: 's2', parcelId: 'p1', name: 'Toprak Sıcaklık #1', type: 'soil_temperature', unit: '°C', value: 19.4, status: 'active', battery: 78, lat: 38.6196, lng: 27.0660 },
+    { id: 's3', parcelId: 'p2', name: 'Toprak Nem #2', type: 'soil_moisture', unit: '%', value: 28, status: 'active', battery: 65, lat: 38.6161, lng: 27.0713 },
+    { id: 's4', parcelId: 'p2', name: 'Toprak pH #2', type: 'soil_ph', unit: 'pH', value: 6.8, status: 'active', battery: 65, lat: 38.6161, lng: 27.0713 },
+    { id: 's5', parcelId: 'p3', name: 'Toprak EC #3', type: 'soil_ec', unit: 'µS/cm', value: 1240, status: 'active', battery: 82, lat: 38.6156, lng: 27.0626 },
+    { id: 's6', parcelId: 'p4', name: 'Sera Hava Nem', type: 'air_humidity', unit: '%', value: 72, status: 'active', battery: 91, lat: 38.6186, lng: 27.0699 },
+    { id: 's7', parcelId: 'p4', name: 'Sera Hava Sıcaklık', type: 'air_temperature', unit: '°C', value: 24.6, status: 'active', battery: 91, lat: 38.6186, lng: 27.0699 },
+    { id: 's8', parcelId: 'p4', name: 'Sera Işık', type: 'light', unit: 'lx', value: 18400, status: 'active', battery: 91, lat: 38.6186, lng: 27.0699 },
+    { id: 's9', parcelId: null, name: 'Hava İstasyonu Merkez', type: 'wind', unit: 'km/h', value: 12, status: 'active', battery: 88, lat: 38.6177, lng: 27.0673 },
+    { id: 's10', parcelId: null, name: 'Yağmur Ölçer', type: 'rainfall', unit: 'mm', value: 0, status: 'active', battery: 88, lat: 38.6177, lng: 27.0673 },
+    { id: 's11', parcelId: 'p6', name: 'Toprak Nem #6', type: 'soil_moisture', unit: '%', value: 38, status: 'active', battery: 14, lat: 38.6173, lng: 27.0641 },
+    { id: 's12', parcelId: null, name: 'Su Tankı Seviye', type: 'tank_level', unit: '%', value: 64, status: 'active', battery: 76, lat: 38.6180, lng: 27.0650 },
+    { id: 's13', parcelId: null, name: 'Sulama Hattı Basınç', type: 'water_pressure', unit: 'bar', value: 2.4, status: 'active', battery: 76, lat: 38.6180, lng: 27.0650 }
+  ],
+  weather: {
+    current: { temp: 18, feels: 17, condition: 'Parçalı bulutlu', humidity: 64, wind: 12, rain: 0, icon: '⛅' },
+    forecast: [
+      { day: 'Bgn', high: 21, low: 12, icon: '⛅', rain: 5 },
+      { day: 'Per', high: 23, low: 13, icon: '☀️', rain: 0 },
+      { day: 'Cum', high: 19, low: 11, icon: '🌧️', rain: 14 },
+      { day: 'Cmt', high: 17, low: 10, icon: '🌧️', rain: 22 },
+      { day: 'Paz', high: 20, low: 11, icon: '⛅', rain: 2 },
+      { day: 'Pzt', high: 22, low: 13, icon: '☀️', rain: 0 },
+      { day: 'Sal', high: 24, low: 14, icon: '☀️', rain: 0 }
+    ]
+  },
+  tasks: [
+    { id: 't1', title: 'Domates Tarlası A — Sulama', parcelId: 'p1', type: 'irrigation', status: 'planned', due: '2026-04-29', assignedTo: 'u2', priority: 'high' },
+    { id: 't2', title: 'Buğday Tarlası B — Yabancı ot ilaçlama', parcelId: 'p2', type: 'pesticide', status: 'in_progress', due: '2026-04-29', assignedTo: 'u2', priority: 'medium' },
+    { id: 't3', title: 'Zeytin Bahçesi — Budama kontrolü', parcelId: 'p3', type: 'pruning', status: 'planned', due: '2026-04-30', assignedTo: 'u2', priority: 'low' },
+    { id: 't4', title: 'Sera Salatalık — Hasat', parcelId: 'p4', type: 'harvest', status: 'completed', due: '2026-04-28', assignedTo: 'u2', priority: 'high', completedAt: '2026-04-28' },
+    { id: 't5', title: 'Mısır Tarlası — Toprak hazırlığı', parcelId: 'p5', type: 'planting', status: 'planned', due: '2026-05-05', assignedTo: 'u2', priority: 'medium' },
+    { id: 't6', title: 'Üzüm Bağı — Gübreleme', parcelId: 'p6', type: 'fertilize', status: 'overdue', due: '2026-04-26', assignedTo: 'u2', priority: 'high' },
+    { id: 't7', title: 'Sensör #11 — Pil değişimi', parcelId: 'p6', type: 'maintenance', status: 'planned', due: '2026-04-30', assignedTo: 'u2', priority: 'medium' }
+  ],
+  expenses: [
+    { id: 'e1', parcelId: 'p1', category: 'Tohum', amount: 8400, date: '2026-03-10', desc: 'Domates fidesi (1500 adet)' },
+    { id: 'e2', parcelId: 'p1', category: 'Gübre', amount: 3200, date: '2026-03-20', desc: 'NPK 15-15-15' },
+    { id: 'e3', parcelId: 'p1', category: 'İşçilik', amount: 4800, date: '2026-03-15', desc: 'Dikim işçiliği' },
+    { id: 'e4', parcelId: 'p2', category: 'Tohum', amount: 12500, date: '2025-11-15', desc: 'Buğday tohumu' },
+    { id: 'e5', parcelId: 'p2', category: 'Mazot', amount: 6800, date: '2025-11-20', desc: 'Sürüm + ekim' },
+    { id: 'e6', parcelId: 'p2', category: 'İlaç', amount: 2400, date: '2026-02-10', desc: 'Yabancı ot ilacı' },
+    { id: 'e7', parcelId: 'p3', category: 'Bakım', amount: 5200, date: '2026-02-20', desc: 'Budama' },
+    { id: 'e8', parcelId: 'p4', category: 'Sulama', amount: 1800, date: '2026-04-15', desc: 'Damla sulama hattı' },
+    { id: 'e9', parcelId: 'p6', category: 'Gübre', amount: 2100, date: '2026-04-05', desc: 'Organik gübre' },
+    { id: 'e10', parcelId: 'p6', category: 'İşçilik', amount: 3600, date: '2026-04-12', desc: 'Asma bağlama' }
+  ],
+  revenues: [
+    { id: 'r1', parcelId: 'p4', product: 'Salatalık', quantity: 4200, unitPrice: 18, total: 75600, date: '2026-04-28' },
+    { id: 'r2', parcelId: 'p3', product: 'Zeytin (geçen sezon)', quantity: 2800, unitPrice: 32, total: 89600, date: '2025-11-15' },
+    { id: 'r3', parcelId: 'p6', product: 'Üzüm (geçen sezon)', quantity: 1500, unitPrice: 28, total: 42000, date: '2025-09-20' }
+  ],
+  inventory: [
+    { id: 'i1', name: 'NPK 15-15-15 Gübre', category: 'Gübre', stock: 240, min: 100, unit: 'kg', cost: 32 },
+    { id: 'i2', name: 'Domates Tohumu H-2274', category: 'Tohum', stock: 8, min: 5, unit: 'paket', cost: 850 },
+    { id: 'i3', name: 'Buğday Tohumu Trakya', category: 'Tohum', stock: 320, min: 200, unit: 'kg', cost: 18 },
+    { id: 'i4', name: 'Yabancı Ot İlacı', category: 'İlaç', stock: 4, min: 6, unit: 'lt', cost: 280 },
+    { id: 'i5', name: 'Mantar İlacı', category: 'İlaç', stock: 12, min: 5, unit: 'lt', cost: 320 },
+    { id: 'i6', name: 'Mazot', category: 'Yakıt', stock: 180, min: 200, unit: 'lt', cost: 42 },
+    { id: 'i7', name: 'Damla Sulama Borusu', category: 'Ekipman', stock: 1200, min: 300, unit: 'metre', cost: 4 },
+    { id: 'i8', name: 'Organik Gübre', category: 'Gübre', stock: 80, min: 100, unit: 'kg', cost: 14 }
+  ],
+  alerts: [
+    { id: 'a1', type: 'frost', severity: 'danger', title: 'Don Riski — Cumartesi gecesi', parcelId: 'p1', message: 'Cumartesi gecesi sıcaklığın +1°C\'ye düşmesi bekleniyor. Domates fideleri risk altında.', time: '2 saat önce' },
+    { id: 'a2', type: 'low_moisture', severity: 'warn', title: 'Düşük Toprak Nemi', parcelId: 'p2', message: 'Buğday Tarlası B nemi %28\'e düştü. Sulama önerilir.', time: '4 saat önce' },
+    { id: 'a3', type: 'low_battery', severity: 'warn', title: 'Sensör Pili Kritik', parcelId: 'p6', message: 'Üzüm Bağı toprak nem sensörü pili %14. En kısa zamanda değiştirin.', time: '6 saat önce' },
+    { id: 'a4', type: 'wind', severity: 'info', title: 'Kuvvetli Rüzgar Bekleniyor', message: 'Yarın öğleden sonra rüzgar 35 km/h\'a ulaşabilir. İlaçlama önerilmez.', time: '8 saat önce' },
+    { id: 'a5', type: 'low_stock', severity: 'warn', title: 'Kritik Stok: Yabancı Ot İlacı', message: 'Stok 4 lt\'ye düştü (kritik seviye 6 lt).', time: '1 gün önce' },
+    { id: 'a6', type: 'rain', severity: 'info', title: 'Yağmur Bekleniyor', message: 'Cuma-Cumartesi günleri 36mm yağış bekleniyor. Sulamayı erteleyin.', time: '1 gün önce' },
+    { id: 'a7', type: 'overdue_task', severity: 'danger', title: 'Geciken Görev', parcelId: 'p6', message: 'Üzüm Bağı gübreleme görevi 3 gün gecikti.', time: '2 gün önce' }
+  ]
+};
+
+/* Sensör tip ikonları + tip-isim haritası */
+const sensorMeta = {
+  soil_moisture:    { label: 'Toprak Nemi',    icon: 'droplet' },
+  soil_temperature: { label: 'Toprak Sıcaklığı', icon: 'thermometer' },
+  soil_ph:          { label: 'Toprak pH',      icon: 'flask' },
+  soil_ec:          { label: 'EC / Tuzluluk',  icon: 'zap' },
+  air_temperature:  { label: 'Hava Sıcaklığı', icon: 'sun' },
+  air_humidity:     { label: 'Hava Nemi',      icon: 'cloud' },
+  light:            { label: 'Işık Seviyesi',  icon: 'sun' },
+  wind:             { label: 'Rüzgar',         icon: 'wind' },
+  rainfall:         { label: 'Yağış',          icon: 'cloud-rain' },
+  tank_level:       { label: 'Tank Seviye',    icon: 'database' },
+  water_pressure:   { label: 'Su Basıncı',     icon: 'gauge' }
+};
+
+/* SVG ikon kütüphanesi */
+const icons = {
+  dashboard: '<path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 9h8V3h-8z"/>',
+  layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  droplet: '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  dollar: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  package: '<line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  thermometer: '<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>',
+  flask: '<path d="M9 3h6M10 3v6L4 21h16L14 9V3"/>',
+  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  cloud: '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+  wind: '<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>',
+  'cloud-rain': '<line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
+  gauge: '<path d="M12 14l4-4M3.34 19a10 10 0 1 1 17.32 0"/>',
+  alert: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  trending: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  map: '<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>'
+};
+
+const iconSvg = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
+
+/* =========================================================
+   Mock API
+   ========================================================= */
+const api = {
+  async login(email, password) {
+    await sleep(200);
+    const u = db.users.find(x => x.email === email && x.password === password);
+    if (!u) throw new Error('Geçersiz bilgiler');
+    return { user: u, token: 'mock-jwt-' + Math.random().toString(36).slice(2) };
+  },
+  parcels: () => Promise.resolve(db.parcels),
+  parcel: (id) => Promise.resolve(db.parcels.find(p => p.id === id)),
+  sensors: () => Promise.resolve(db.sensors),
+  sensorReadings: (sensorId, hours = 24) => {
+    const sensor = db.sensors.find(s => s.id === sensorId);
+    if (!sensor) return Promise.resolve([]);
+    return Promise.resolve(generateReadings(sensor, hours));
+  },
+  weather: () => Promise.resolve(db.weather),
+  tasks: () => Promise.resolve(db.tasks),
+  expenses: () => Promise.resolve(db.expenses),
+  revenues: () => Promise.resolve(db.revenues),
+  inventory: () => Promise.resolve(db.inventory),
+  alerts: () => Promise.resolve(db.alerts),
+  irrigationRecommendations: () => {
+    return Promise.resolve(db.parcels.filter(p => p.status === 'growing').map(p => {
+      const need = p.crop === 'Salatalık' ? 55 : p.crop === 'Domates' ? 45 : p.crop === 'Buğday' ? 35 : 30;
+      const rain48h = db.weather.forecast.slice(0,2).reduce((s,d)=>s+d.rain,0);
+      let decision = 'ok', reason = `Nem yeterli (%${p.moisture}).`;
+      if (p.moisture < need - 10 && rain48h < 5) { decision = 'irrigate'; reason = `Nem %${p.moisture}, hedef %${need}. 48 saatte ${rain48h}mm yağmur. Sulama gerekli.`; }
+      else if (p.moisture < need && rain48h >= 5) { decision = 'skip'; reason = `Nem düşük ama 48 saatte ${rain48h}mm yağmur bekleniyor. Sulamayı erteleyin.`; }
+      else if (p.moisture >= need) { decision = 'ok'; reason = `Nem hedefin üzerinde (%${p.moisture} / hedef %${need}).`; }
+      return { parcelId: p.id, parcelName: p.name, crop: p.crop, currentMoisture: p.moisture, targetMoisture: need, rain48h, decision, reason };
+    }));
+  }
+};
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+function generateReadings(sensor, hours) {
+  const out = [];
+  const now = Date.now();
+  let v = sensor.value;
+  for (let i = hours; i >= 0; i--) {
+    const t = now - i * 3600 * 1000;
+    const noise = (Math.random() - 0.5) * (sensor.value * 0.08);
+    v = Math.max(0, sensor.value + noise + Math.sin(i / 4) * (sensor.value * 0.05));
+    out.push({ time: t, value: +v.toFixed(2) });
+  }
+  return out;
+}
+
+/* =========================================================
+   Uygulama durumu + render
+   ========================================================= */
+
+const state = { user: null, token: null, page: 'dashboard', charts: {}, map: null };
+
+const NAV = [
+  { id: 'dashboard',  label: 'Dashboard',     icon: 'dashboard', section: 'main' },
+  { id: 'parcels',    label: 'Tarla & Parsel', icon: 'layers',    section: 'main' },
+  { id: 'sensors',    label: 'Sensörler',     icon: 'cpu',       section: 'main' },
+  { id: 'weather',    label: 'Hava & Uydu',   icon: 'sun',       section: 'main' },
+  { id: 'irrigation', label: 'Sulama',        icon: 'droplet',   section: 'main' },
+  { id: 'tasks',      label: 'Görevler',      icon: 'check',     section: 'admin', badge: 3 },
+  { id: 'finance',    label: 'Maliyet & Gelir', icon: 'dollar',  section: 'admin' },
+  { id: 'inventory',  label: 'Envanter',      icon: 'package',   section: 'admin' },
+  { id: 'alerts',     label: 'Uyarılar',      icon: 'bell',      section: 'admin', badge: 5 },
+  { id: 'reports',    label: 'Raporlar',      icon: 'file',      section: 'admin' }
+];
+
+const PAGE_TITLES = {
+  dashboard:  { title: 'Dashboard',         subtitle: 'Çiftliğine genel bakış' },
+  parcels:    { title: 'Tarla & Parsel',    subtitle: 'Tüm parsellerin durumu' },
+  sensors:    { title: 'Sensörler',         subtitle: 'Canlı IoT verileri' },
+  weather:    { title: 'Hava & Uydu',       subtitle: 'Tahmin ve NDVI verisi' },
+  irrigation: { title: 'Sulama Önerileri',  subtitle: 'Akıllı karar destek' },
+  tasks:      { title: 'Görevler',          subtitle: 'Saha operasyonları' },
+  finance:    { title: 'Maliyet & Gelir',   subtitle: 'Finansal performans' },
+  inventory:  { title: 'Envanter',          subtitle: 'Stok ve ekipman' },
+  alerts:     { title: 'Uyarılar',          subtitle: 'Aktif bildirimler' },
+  reports:    { title: 'Raporlar',          subtitle: 'Analiz ve dışa aktarma' }
+};
+
+/* =========================================================
+   Login / Logout
+   ========================================================= */
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value;
+  try {
+    const { user, token } = await api.login(email, pass);
+    state.user = user;
+    state.token = token;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('is-active');
+    renderSidebar();
+    navigateTo('dashboard');
+    toast(`Hoş geldin, ${user.name.split(' ')[0]}!`, 'success');
+  } catch (e) {
+    toast(e.message, 'danger');
+  }
+}
+function quickLogin(email) {
+  document.getElementById('email').value = email;
+  document.getElementById('password').value = 'demo1234';
+  login();
+}
+function logout() {
+  state.user = null; state.token = null;
+  document.getElementById('app').classList.remove('is-active');
+  document.getElementById('loginScreen').style.display = 'grid';
+  destroyCharts();
+}
+
+/* =========================================================
+   Sidebar
+   ========================================================= */
+function renderSidebar() {
+  const main = document.getElementById('navMain');
+  const admin = document.getElementById('navAdmin');
+  main.innerHTML = NAV.filter(n => n.section === 'main').map(navItemHtml).join('');
+  admin.innerHTML = NAV.filter(n => n.section === 'admin').map(navItemHtml).join('');
+  const u = state.user;
+  document.getElementById('userAvatar').textContent = u.name.charAt(0);
+  document.getElementById('userName').textContent = u.name;
+  document.getElementById('userRole').textContent = u.roleName;
+}
+function navItemHtml(n) {
+  return `
+    <a class="nav-item ${state.page === n.id ? 'is-active' : ''}" onclick="navigateTo('${n.id}')">
+      ${iconSvg(n.icon)}
+      <span>${n.label}</span>
+      ${n.badge ? `<span class="nav-badge">${n.badge}</span>` : ''}
+    </a>`;
+}
+
+/* =========================================================
+   Sayfa yönlendirme
+   ========================================================= */
+function navigateTo(page) {
+  state.page = page;
+  destroyCharts();
+  renderSidebar();
+  const meta = PAGE_TITLES[page];
+  document.getElementById('pageTitle').textContent = meta.title;
+  document.getElementById('pageSubtitle').textContent = meta.subtitle;
+  document.getElementById('sidebar').classList.remove('is-open');
+  const renderer = pageRenderers[page] || (() => `<div class="card">Yakında...</div>`);
+  document.getElementById('content').innerHTML = renderer();
+  // Chart/map setup'larını render sonrası başlat
+  setTimeout(() => pageHooks[page] && pageHooks[page](), 50);
+  window.scrollTo(0, 0);
+}
+
+function destroyCharts() {
+  Object.values(state.charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  state.charts = {};
+  if (state.map) { try { state.map.remove(); } catch(e){} state.map = null; }
+}
+
+/* =========================================================
+   Sayfa render fonksiyonları
+   ========================================================= */
+const pageRenderers = {
+  dashboard: () => {
+    const totalArea = db.parcels.reduce((s,p) => s + p.areaDa, 0);
+    const activeCrops = new Set(db.parcels.filter(p => p.status === 'growing').map(p => p.crop)).size;
+    const todayTasks = db.tasks.filter(t => t.due === '2026-04-29').length;
+    const totalRevenue = db.revenues.reduce((s,r) => s + r.total, 0);
+    const totalExpense = db.expenses.reduce((s,e) => s + e.amount, 0);
+    const profit = totalRevenue - totalExpense;
+    const margin = ((profit / totalRevenue) * 100).toFixed(1);
+
+    return `
+      <div class="grid grid-12" style="gap:18px;">
+        <!-- Hero -->
+        <div class="col-12 fade-up">
+          <div class="hero-card">
+            <div class="hero-greeting">Hoş geldin, ${state.user.name.split(' ')[0]}</div>
+            <h2 class="hero-title">Bugün <em>çiftliğin</em> seni bekliyor.</h2>
+            <p style="margin-top:10px;color:rgba(236,246,239,0.7);max-width:560px;">
+              ${db.farm.name} · ${db.farm.city}/${db.farm.district} · ${totalArea.toFixed(1)} dönüm · ${db.parcels.length} parsel
+            </p>
+            <div class="hero-meta">
+              <div class="item"><span class="item-label">Bugün</span><span class="item-value">${db.weather.current.temp}°C ${db.weather.current.icon}</span></div>
+              <div class="item"><span class="item-label">Aktif uyarı</span><span class="item-value">${db.alerts.length}</span></div>
+              <div class="item"><span class="item-label">Bugünkü görev</span><span class="item-value">${todayTasks}</span></div>
+              <div class="item"><span class="item-label">Sensör</span><span class="item-value">${db.sensors.length} aktif</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI'lar -->
+        <div class="col-3 fade-up"><div class="kpi">
+          <div class="kpi-icon">${iconSvg('layers')}</div>
+          <div class="kpi-label">Toplam Alan</div>
+          <div class="kpi-value">${totalArea.toFixed(1)} <span style="font-size:14px;color:var(--text-muted);font-weight:500;">dönüm</span></div>
+          <span class="kpi-trend up">↑ ${db.parcels.length} parsel</span>
+        </div></div>
+
+        <div class="col-3 fade-up"><div class="kpi">
+          <div class="kpi-icon gold">${iconSvg('trending')}</div>
+          <div class="kpi-label">Aktif Ürünler</div>
+          <div class="kpi-value">${activeCrops}</div>
+          <span class="kpi-trend up">${db.parcels.filter(p=>p.status==='growing').length} parselde</span>
+        </div></div>
+
+        <div class="col-3 fade-up"><div class="kpi">
+          <div class="kpi-icon sky">${iconSvg('dollar')}</div>
+          <div class="kpi-label">Net Kâr</div>
+          <div class="kpi-value">₺${(profit/1000).toFixed(1)}K</div>
+          <span class="kpi-trend up">↑ %${margin} marj</span>
+        </div></div>
+
+        <div class="col-3 fade-up"><div class="kpi">
+          <div class="kpi-icon earth">${iconSvg('alert')}</div>
+          <div class="kpi-label">Aktif Uyarı</div>
+          <div class="kpi-value">${db.alerts.length}</div>
+          <span class="kpi-trend down">${db.alerts.filter(a=>a.severity==='danger').length} kritik</span>
+        </div></div>
+
+        <!-- Nem grafiği + hava -->
+        <div class="col-8 fade-up"><div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Toprak Nem Trendi</div><div class="card-subtitle">Son 24 saat — tüm parseller</div></div>
+            <span class="badge success">Canlı</span>
+          </div>
+          <div class="chart-box"><canvas id="moistureChart"></canvas></div>
+        </div></div>
+
+        <div class="col-4 fade-up"><div class="card" style="height:100%;">
+          <div class="card-header"><div class="card-title">7 Günlük Hava</div></div>
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:12px;">
+            <div style="font-size:48px;line-height:1;">${db.weather.current.icon}</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:32px;font-weight:600;">${db.weather.current.temp}°C</div>
+              <div style="font-size:12px;color:var(--text-muted);">${db.weather.current.condition}</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+            ${db.weather.forecast.slice(0,7).map(d => `
+              <div style="text-align:center;padding:6px 2px;">
+                <div style="font-size:10px;color:var(--text-muted);font-weight:600;">${d.day}</div>
+                <div style="font-size:18px;margin:4px 0;">${d.icon}</div>
+                <div style="font-size:11px;font-weight:600;">${d.high}°</div>
+                <div style="font-size:10px;color:var(--text-muted);">${d.low}°</div>
+              </div>`).join('')}
+          </div>
+        </div></div>
+
+        <!-- Görevler + Uyarılar -->
+        <div class="col-6 fade-up"><div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Yaklaşan Görevler</div><div class="card-subtitle">Bu hafta yapılacaklar</div></div>
+            <button class="btn btn-ghost" onclick="navigateTo('tasks')">Tümü →</button>
+          </div>
+          ${db.tasks.filter(t => t.status !== 'completed').slice(0,5).map(t => {
+            const p = db.parcels.find(x => x.id === t.parcelId);
+            const sevClass = t.status === 'overdue' ? 'danger' : (t.priority === 'high' ? 'warn' : '');
+            return `<div class="list-item">
+              <div class="list-icon ${sevClass}">${iconSvg('check')}</div>
+              <div class="list-text">
+                <div class="list-title">${t.title}</div>
+                <div class="list-sub">${p ? p.name : 'Genel'} · ${formatDate(t.due)}</div>
+              </div>
+              <span class="badge ${t.status === 'overdue' ? 'danger' : (t.status === 'in_progress' ? 'info' : 'muted')}">${taskStatusLabel(t.status)}</span>
+            </div>`;
+          }).join('')}
+        </div></div>
+
+        <div class="col-6 fade-up"><div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Kritik Uyarılar</div><div class="card-subtitle">Aktif bildirimler</div></div>
+            <button class="btn btn-ghost" onclick="navigateTo('alerts')">Tümü →</button>
+          </div>
+          ${db.alerts.slice(0,5).map(a => `
+            <div class="list-item">
+              <div class="list-icon ${a.severity}">${iconSvg('alert')}</div>
+              <div class="list-text">
+                <div class="list-title">${a.title}</div>
+                <div class="list-sub">${a.time}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div></div>
+      </div>
+    `;
+  },
+
+  parcels: () => {
+    return `
+      <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge muted">${db.parcels.length} parsel</span>
+          <span class="badge success">${db.parcels.filter(p=>p.status==='growing').length} aktif</span>
+          <span class="badge muted">${db.parcels.reduce((s,p)=>s+p.areaDa,0).toFixed(1)} dönüm</span>
+        </div>
+        <button class="btn btn-gold">+ Yeni Parsel</button>
+      </div>
+
+      <div class="card fade-up" style="padding:0;overflow:hidden;margin-bottom:20px;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);">
+          <div class="card-title">Parsel Haritası</div>
+          <div class="card-subtitle">Tüm parseller ve sensörler</div>
+        </div>
+        <div id="parcelMap" class="map-container" style="border-radius:0;border:none;height:380px;"></div>
+      </div>
+
+      <div class="grid grid-3" style="gap:16px;">
+        ${db.parcels.map((p,i) => {
+          const sensors = db.sensors.filter(s => s.parcelId === p.id);
+          const moistureClass = p.moisture < 30 ? 'danger' : (p.moisture < 40 ? 'warn' : 'success');
+          return `
+            <div class="parcel-card fade-up" onclick="showParcelDetail('${p.id}')" style="animation-delay:${i*0.05}s;">
+              <div class="parcel-img ${p.cropClass}">
+                ${iconSvg('layers')}
+                <span class="area-tag">${p.areaDa} dönüm</span>
+              </div>
+              <div class="parcel-info">
+                <div class="parcel-name">${p.name}</div>
+                <div class="parcel-crop">${p.crop} · ${p.variety}</div>
+                <div class="parcel-stats">
+                  <div class="parcel-stat">
+                    <div class="parcel-stat-label">Nem</div>
+                    <div class="parcel-stat-value ${moistureClass}">%${p.moisture}</div>
+                  </div>
+                  <div class="parcel-stat">
+                    <div class="parcel-stat-label">NDVI</div>
+                    <div class="parcel-stat-value">${p.ndvi.toFixed(2)}</div>
+                  </div>
+                  <div class="parcel-stat">
+                    <div class="parcel-stat-label">Sensör</div>
+                    <div class="parcel-stat-value">${sensors.length}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  sensors: () => {
+    return `
+      <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge success">${db.sensors.filter(s=>s.status==='active').length} aktif</span>
+          <span class="badge warn">${db.sensors.filter(s=>s.battery<20).length} düşük pil</span>
+          <span class="badge muted">11 farklı tip</span>
+        </div>
+        <button class="btn btn-outline">+ Sensör Ekle</button>
+      </div>
+
+      <div class="grid grid-4" style="gap:16px;">
+        ${db.sensors.map((s,i) => {
+          const meta = sensorMeta[s.type] || { label: s.type, icon: 'cpu' };
+          const parcel = db.parcels.find(p => p.id === s.parcelId);
+          let pct = 0;
+          if (s.type === 'soil_moisture' || s.type === 'air_humidity' || s.type === 'tank_level') pct = s.value;
+          else if (s.type === 'soil_temperature' || s.type === 'air_temperature') pct = (s.value / 40) * 100;
+          else if (s.type === 'soil_ph') pct = (s.value / 14) * 100;
+          else if (s.type === 'wind') pct = (s.value / 50) * 100;
+          else pct = 60;
+          const lowBat = s.battery < 20;
+          return `
+            <div class="sensor-card fade-up" onclick="showSensorChart('${s.id}')" style="animation-delay:${i*0.03}s;">
+              <div class="head">
+                <div>
+                  <div class="sensor-name">${meta.label}</div>
+                  <div class="sensor-loc">${parcel ? parcel.name : 'Genel'}</div>
+                </div>
+                <div class="sensor-icon">${iconSvg(meta.icon)}</div>
+              </div>
+              <div>
+                <span class="sensor-value">${s.value}</span><span class="sensor-unit">${s.unit}</span>
+              </div>
+              <div class="sensor-bar"><span style="width:${Math.min(100, pct)}%"></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11px;color:var(--text-muted);">
+                <span>${s.name}</span>
+                <span class="${lowBat?'badge danger':'badge muted'}" style="font-size:10px;padding:2px 6px;">🔋 ${s.battery}%</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  weather: () => {
+    return `
+      <div class="grid grid-12" style="gap:18px;">
+        <div class="col-8 fade-up"><div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Mevcut Hava Durumu</div><div class="card-subtitle">${db.farm.city} / ${db.farm.district}</div></div>
+            <span class="badge success">Canlı</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:24px;padding:20px 0;flex-wrap:wrap;">
+            <div style="font-size:96px;line-height:1;">${db.weather.current.icon}</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:64px;font-weight:600;line-height:1;letter-spacing:-0.03em;">${db.weather.current.temp}<span style="font-size:32px;color:var(--text-muted);">°C</span></div>
+              <div style="font-size:15px;color:var(--text-soft);margin-top:6px;">${db.weather.current.condition}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Hissedilen ${db.weather.current.feels}°C</div>
+            </div>
+            <div style="margin-left:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;">
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Nem</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">%${db.weather.current.humidity}</div></div>
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Rüzgar</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">${db.weather.current.wind} km/h</div></div>
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Yağış</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">${db.weather.current.rain} mm</div></div>
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Görüş</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">10 km</div></div>
+            </div>
+          </div>
+        </div></div>
+
+        <div class="col-4 fade-up"><div class="card">
+          <div class="card-header"><div class="card-title">Tarımsal Uyarılar</div></div>
+          <div class="list-item">
+            <div class="list-icon danger">${iconSvg('alert')}</div>
+            <div class="list-text">
+              <div class="list-title">Don Riski</div>
+              <div class="list-sub">Cumartesi gecesi +1°C</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon info">${iconSvg('cloud-rain')}</div>
+            <div class="list-text">
+              <div class="list-title">Yağış Bekleniyor</div>
+              <div class="list-sub">Cuma-Cmt 36mm</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon warn">${iconSvg('wind')}</div>
+            <div class="list-text">
+              <div class="list-title">Rüzgar Uyarısı</div>
+              <div class="list-sub">Yarın 35 km/h</div>
+            </div>
+          </div>
+        </div></div>
+
+        <div class="col-12 fade-up"><div class="card">
+          <div class="card-header"><div class="card-title">7 Günlük Tahmin</div></div>
+          <div class="grid grid-4" style="grid-template-columns:repeat(7,1fr);gap:10px;">
+            ${db.weather.forecast.map(d => `
+              <div class="weather-day">
+                <div class="day">${d.day}</div>
+                <div class="icon">${d.icon}</div>
+                <div class="temp-high">${d.high}°</div>
+                <div class="temp-low">${d.low}°</div>
+                ${d.rain > 0 ? `<div style="font-size:10px;color:var(--sky-700);margin-top:6px;">💧 ${d.rain}mm</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div></div>
+
+        <div class="col-12 fade-up"><div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Uydu Bitki İndeksi (NDVI)</div><div class="card-subtitle">Sentinel-2 · son 7 gün</div></div>
+          </div>
+          <table class="table">
+            <thead><tr><th>Parsel</th><th>Ürün</th><th>NDVI</th><th>EVI</th><th>Toprak Nem İdx</th><th>Durum</th></tr></thead>
+            <tbody>
+              ${db.parcels.map(p => {
+                const evi = (p.ndvi * 0.85 + 0.05).toFixed(2);
+                const smi = (p.moisture / 100).toFixed(2);
+                const status = p.ndvi > 0.6 ? '<span class="badge success">Sağlıklı</span>' : p.ndvi > 0.3 ? '<span class="badge warn">Orta</span>' : '<span class="badge danger">Zayıf</span>';
+                return `<tr>
+                  <td><strong>${p.name}</strong></td>
+                  <td>${p.crop}</td>
+                  <td><strong>${p.ndvi.toFixed(2)}</strong></td>
+                  <td>${evi}</td>
+                  <td>${smi}</td>
+                  <td>${status}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div></div>
+      </div>
+    `;
+  },
+
+  irrigation: () => {
+    const recs = db.parcels.filter(p => p.status === 'growing').map(p => {
+      const need = p.crop === 'Salatalık' ? 55 : p.crop === 'Domates' ? 45 : p.crop === 'Buğday' ? 35 : 30;
+      const rain48h = db.weather.forecast.slice(0,2).reduce((s,d)=>s+d.rain,0);
+      let decision = 'ok', reason = `Nem yeterli (%${p.moisture}). Sulama gerekmez.`, badge = 'success', label = 'İyi';
+      if (p.moisture < need - 10 && rain48h < 5) { decision='irrigate'; reason=`Nem %${p.moisture}, hedef %${need}. 48 saatte ${rain48h}mm yağmur. Sulama gerekli.`; badge='danger'; label='Sula!'; }
+      else if (p.moisture < need && rain48h >= 5) { decision='skip'; reason=`Nem düşük ama 48 saatte ${rain48h}mm yağmur bekleniyor. Sulamayı erteleyin.`; badge='info'; label='Bekle'; }
+      else if (p.moisture < need) { decision='watch'; reason=`Nem hedefin biraz altında. Yarınki tahminle tekrar değerlendirin.`; badge='warn'; label='Takip'; }
+      return { ...p, need, rain48h, decision, reason, badge, label };
+    });
+    return `
+      <div style="margin-bottom:20px;">
+        <div class="card" style="background:linear-gradient(135deg,var(--brand-700),var(--brand-900));color:#fff;border:none;">
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+            <div style="font-size:48px;">💧</div>
+            <div style="flex:1;min-width:240px;">
+              <h3 style="font-family:var(--font-display);font-size:22px;font-weight:600;margin-bottom:6px;">Akıllı Sulama Karar Motoru</h3>
+              <p style="color:rgba(236,246,239,0.75);font-size:13px;">Toprak nemi, ürün su ihtiyacı, 48 saatlik yağmur tahmini ve evapotranspirasyon hesaplanarak öneri üretilir.</p>
+            </div>
+            <div style="display:flex;gap:24px;flex-wrap:wrap;">
+              <div><div style="font-size:11px;color:var(--gold-300);text-transform:uppercase;letter-spacing:0.05em;">Sulanacak</div><div style="font-family:var(--font-display);font-size:26px;font-weight:600;">${recs.filter(r=>r.decision==='irrigate').length}</div></div>
+              <div><div style="font-size:11px;color:var(--gold-300);text-transform:uppercase;letter-spacing:0.05em;">Bekle (yağmur)</div><div style="font-family:var(--font-display);font-size:26px;font-weight:600;">${recs.filter(r=>r.decision==='skip').length}</div></div>
+              <div><div style="font-size:11px;color:var(--gold-300);text-transform:uppercase;letter-spacing:0.05em;">İyi durumda</div><div style="font-family:var(--font-display);font-size:26px;font-weight:600;">${recs.filter(r=>r.decision==='ok').length}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-2" style="gap:16px;">
+        ${recs.map((r,i) => `
+          <div class="card fade-up" style="animation-delay:${i*0.05}s;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+              <div>
+                <div style="font-family:var(--font-display);font-size:17px;font-weight:600;">${r.name}</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${r.crop}</div>
+              </div>
+              <span class="badge ${r.badge}">${r.label}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Mevcut Nem</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">%${r.moisture}</div></div>
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Hedef</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">%${r.need}</div></div>
+              <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">48s Yağış</div><div style="font-family:var(--font-display);font-size:22px;font-weight:600;">${r.rain48h}mm</div></div>
+            </div>
+            <div style="background:var(--surface-2);padding:12px 14px;border-radius:10px;font-size:13px;color:var(--text-soft);line-height:1.5;border-left:3px solid var(--brand-400);">
+              ${r.reason}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  },
+
+  tasks: () => {
+    const planned = db.tasks.filter(t => t.status === 'planned');
+    const inProgress = db.tasks.filter(t => t.status === 'in_progress');
+    const overdue = db.tasks.filter(t => t.status === 'overdue');
+    const completed = db.tasks.filter(t => t.status === 'completed');
+
+    const taskItem = (t) => {
+      const p = db.parcels.find(x => x.id === t.parcelId);
+      const checked = t.status === 'completed';
+      return `
+        <div class="task-card ${checked?'done':''}">
+          <div class="task-checkbox ${checked?'checked':''}" onclick="toggleTask('${t.id}')">${checked ? iconSvg('check') : ''}</div>
+          <div class="task-content">
+            <div class="task-title">${t.title}</div>
+            <div class="task-meta">
+              <span>${p ? p.name : 'Genel'}</span>
+              <span>·</span>
+              <span>${formatDate(t.due)}</span>
+              <span class="badge ${priorityBadge(t.priority)}" style="margin-left:6px;">${priorityLabel(t.priority)}</span>
+            </div>
+          </div>
+          <span class="badge ${taskBadge(t.status)}">${taskStatusLabel(t.status)}</span>
+        </div>
+      `;
+    };
+
+    return `
+      <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge muted">${db.tasks.length} toplam</span>
+          <span class="badge danger">${overdue.length} gecikmiş</span>
+          <span class="badge info">${inProgress.length} devam eden</span>
+          <span class="badge success">${completed.length} tamamlanan</span>
+        </div>
+        <button class="btn btn-gold">+ Yeni Görev</button>
+      </div>
+
+      <div class="grid grid-4" style="gap:16px;margin-bottom:24px;">
+        <div class="kpi"><div class="kpi-icon">${iconSvg('check')}</div><div class="kpi-label">Planlandı</div><div class="kpi-value">${planned.length}</div></div>
+        <div class="kpi"><div class="kpi-icon sky">${iconSvg('check')}</div><div class="kpi-label">Devam Ediyor</div><div class="kpi-value">${inProgress.length}</div></div>
+        <div class="kpi"><div class="kpi-icon" style="background:rgba(200,71,59,0.10);color:var(--danger);">${iconSvg('alert')}</div><div class="kpi-label">Gecikmiş</div><div class="kpi-value">${overdue.length}</div></div>
+        <div class="kpi"><div class="kpi-icon gold">${iconSvg('check')}</div><div class="kpi-label">Tamamlandı</div><div class="kpi-value">${completed.length}</div></div>
+      </div>
+
+      ${overdue.length ? `
+        <div style="margin-bottom:20px;">
+          <h3 style="font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:12px;color:var(--danger);">⚠️ Gecikmiş Görevler</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">${overdue.map(taskItem).join('')}</div>
+        </div>` : ''}
+
+      <div style="margin-bottom:20px;">
+        <h3 style="font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:12px;">Devam Eden ve Planlanan</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">${[...inProgress, ...planned].map(taskItem).join('')}</div>
+      </div>
+
+      ${completed.length ? `
+        <div>
+          <h3 style="font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text-muted);">Tamamlananlar</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">${completed.map(taskItem).join('')}</div>
+        </div>` : ''}
+    `;
+  },
+
+  finance: () => {
+    const totalRev = db.revenues.reduce((s,r)=>s+r.total,0);
+    const totalExp = db.expenses.reduce((s,e)=>s+e.amount,0);
+    const profit = totalRev - totalExp;
+    const margin = ((profit/totalRev)*100).toFixed(1);
+
+    return `
+      <div class="grid grid-3" style="gap:16px;margin-bottom:20px;">
+        <div class="kpi fade-up">
+          <div class="kpi-icon" style="background:rgba(42,125,71,0.1);color:var(--success);">${iconSvg('trending')}</div>
+          <div class="kpi-label">Toplam Gelir</div>
+          <div class="kpi-value" style="color:var(--success);">₺${totalRev.toLocaleString('tr-TR')}</div>
+          <span class="kpi-trend up">${db.revenues.length} satış</span>
+        </div>
+        <div class="kpi fade-up">
+          <div class="kpi-icon" style="background:rgba(200,71,59,0.1);color:var(--danger);">${iconSvg('dollar')}</div>
+          <div class="kpi-label">Toplam Gider</div>
+          <div class="kpi-value" style="color:var(--danger);">₺${totalExp.toLocaleString('tr-TR')}</div>
+          <span class="kpi-trend down">${db.expenses.length} kalem</span>
+        </div>
+        <div class="kpi fade-up">
+          <div class="kpi-icon gold">${iconSvg('dollar')}</div>
+          <div class="kpi-label">Net Kâr</div>
+          <div class="kpi-value">₺${profit.toLocaleString('tr-TR')}</div>
+          <span class="kpi-trend up">↑ %${margin} marj</span>
+        </div>
+      </div>
+
+      <div class="grid grid-12" style="gap:18px;">
+        <div class="col-6 fade-up"><div class="card">
+          <div class="card-header"><div class="card-title">Kategori Bazında Gider</div></div>
+          <div class="chart-box-sm" style="height:280px;"><canvas id="expenseDonut"></canvas></div>
+        </div></div>
+
+        <div class="col-6 fade-up"><div class="card">
+          <div class="card-header"><div class="card-title">Parsel Bazında Maliyet</div></div>
+          <div class="chart-box-sm" style="height:280px;"><canvas id="parcelBar"></canvas></div>
+        </div></div>
+
+        <div class="col-12 fade-up"><div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Son Gider Hareketleri</div></div>
+            <button class="btn btn-outline">+ Gider Ekle</button>
+          </div>
+          <table class="table">
+            <thead><tr><th>Tarih</th><th>Parsel</th><th>Kategori</th><th>Açıklama</th><th style="text-align:right;">Tutar</th></tr></thead>
+            <tbody>
+              ${db.expenses.slice().reverse().map(e => {
+                const p = db.parcels.find(x => x.id === e.parcelId);
+                return `<tr>
+                  <td>${formatDate(e.date)}</td>
+                  <td>${p ? p.name : '—'}</td>
+                  <td><span class="badge muted">${e.category}</span></td>
+                  <td>${e.desc}</td>
+                  <td style="text-align:right;font-weight:600;">₺${e.amount.toLocaleString('tr-TR')}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div></div>
+      </div>
+    `;
+  },
+
+  inventory: () => {
+    return `
+      <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge muted">${db.inventory.length} ürün</span>
+          <span class="badge danger">${db.inventory.filter(i => i.stock < i.min).length} kritik</span>
+          <span class="badge success">₺${db.inventory.reduce((s,i)=>s+(i.stock*i.cost),0).toLocaleString('tr-TR')} toplam değer</span>
+        </div>
+        <button class="btn btn-gold">+ Ürün Ekle</button>
+      </div>
+
+      <div class="grid grid-2" style="gap:16px;">
+        ${db.inventory.map((i,idx) => {
+          const isCritical = i.stock < i.min;
+          const pct = Math.min(100, (i.stock / (i.min * 2)) * 100);
+          return `
+            <div class="card fade-up" style="animation-delay:${idx*0.04}s;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+                <div>
+                  <div style="font-family:var(--font-display);font-size:16px;font-weight:600;">${i.name}</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${i.category}</div>
+                </div>
+                ${isCritical ? '<span class="badge danger">⚠️ Kritik</span>' : '<span class="badge success">Stokta</span>'}
+              </div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;">
+                <div style="font-family:var(--font-display);font-size:30px;font-weight:600;color:${isCritical?'var(--danger)':'var(--text)'};">${i.stock}</div>
+                <div style="font-size:13px;color:var(--text-muted);">${i.unit}</div>
+                <div style="margin-left:auto;font-size:12px;color:var(--text-muted);">Min: ${i.min} ${i.unit}</div>
+              </div>
+              <div class="sensor-bar" style="height:6px;"><span style="width:${pct}%;background:${isCritical?'linear-gradient(90deg,var(--danger),#e85d50)':'linear-gradient(90deg,var(--brand-400),var(--brand-500))'};"></span></div>
+              <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--text-muted);">
+                <span>Birim maliyet: ₺${i.cost}</span>
+                <span>Toplam: <strong style="color:var(--text);">₺${(i.stock*i.cost).toLocaleString('tr-TR')}</strong></span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  alerts: () => {
+    return `
+      <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge danger">${db.alerts.filter(a=>a.severity==='danger').length} kritik</span>
+          <span class="badge warn">${db.alerts.filter(a=>a.severity==='warn').length} uyarı</span>
+          <span class="badge info">${db.alerts.filter(a=>a.severity==='info').length} bilgi</span>
+        </div>
+        <button class="btn btn-outline">Tümünü okundu işaretle</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${db.alerts.map((a,i) => {
+          const p = db.parcels.find(x => x.id === a.parcelId);
+          const iconName = { frost:'thermometer', low_moisture:'droplet', wind:'wind', rain:'cloud-rain', low_battery:'cpu', low_stock:'package', overdue_task:'alert' }[a.type] || 'alert';
+          return `
+            <div class="card fade-up" style="animation-delay:${i*0.04}s;border-left:4px solid var(--${a.severity==='danger'?'danger':a.severity==='warn'?'warn':'info'});">
+              <div style="display:flex;gap:14px;align-items:flex-start;">
+                <div class="list-icon ${a.severity}" style="width:42px;height:42px;">${iconSvg(iconName)}</div>
+                <div style="flex:1;">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                    <div>
+                      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;">${a.title}</div>
+                      ${p ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${p.name}</div>`:''}
+                    </div>
+                    <span style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${a.time}</span>
+                  </div>
+                  <p style="font-size:13.5px;color:var(--text-soft);margin-top:10px;line-height:1.5;">${a.message}</p>
+                  <div style="display:flex;gap:8px;margin-top:14px;">
+                    <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;">Detay</button>
+                    <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;">Okundu işaretle</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  reports: () => {
+    return `
+      <div class="grid grid-2" style="gap:16px;">
+        ${[
+          { title: 'Parsel Üretim Raporu', desc: 'Her parsel için ekim, hasat ve verim verileri', icon:'layers' },
+          { title: 'Maliyet Raporu', desc: 'Ürün ve parsel bazında detaylı maliyet analizi', icon:'dollar' },
+          { title: 'Gelir & Kârlılık', desc: 'Aylık gelir, gider ve kâr-zarar tabloları', icon:'trending' },
+          { title: 'Sulama Raporu', desc: 'Sulama geçmişi ve su tüketim analizi', icon:'droplet' },
+          { title: 'Sensör Geçmişi', desc: 'Tüm sensör verilerinin grafik dökümü', icon:'cpu' },
+          { title: 'NDVI/Uydu Raporu', desc: 'Uydu verisi tabanlı bitki sağlığı analizi', icon:'sun' }
+        ].map((r,i) => `
+          <div class="card fade-up" style="cursor:pointer;animation-delay:${i*0.05}s;" onclick="toast('Rapor üretiliyor...','success')">
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <div class="kpi-icon">${iconSvg(r.icon)}</div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display);font-size:16px;font-weight:600;">${r.title}</div>
+                <p style="font-size:13px;color:var(--text-muted);margin-top:6px;">${r.desc}</p>
+                <div style="display:flex;gap:8px;margin-top:14px;">
+                  <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;">📄 PDF</button>
+                  <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;">📊 Excel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+};
+
+/* =========================================================
+   Page hooks (charts, maps)
+   ========================================================= */
+const pageHooks = {
+  dashboard: () => {
+    const ctx = document.getElementById('moistureChart');
+    if (!ctx) return;
+    const labels = Array.from({length:24}, (_,i) => `${(23-i)}sa önce`).reverse();
+    const datasets = db.parcels.slice(0,4).map((p, i) => {
+      const colors = ['#2a7d47', '#d4b85f', '#3b9bc7', '#8a6a3f'];
+      const data = Array.from({length:25}, (_,j) => Math.max(15, Math.min(70, p.moisture + Math.sin(j/3 + i)*8 + (Math.random()-0.5)*4)));
+      return { label: p.name, data, borderColor: colors[i], backgroundColor: colors[i]+'20', tension: 0.4, fill: false, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4 };
+    });
+    state.charts.moisture = new Chart(ctx, {
+      type: 'line',
+      data: { labels: [...labels, 'Şimdi'], datasets },
+      options: chartOptions('%')
+    });
+  },
+
+  parcels: () => {
+    const el = document.getElementById('parcelMap');
+    if (!el) return;
+    state.map = L.map('parcelMap').setView([db.farm.lat, db.farm.lng], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(state.map);
+    db.parcels.forEach(p => {
+      const color = p.moisture < 30 ? '#c8473b' : p.moisture < 40 ? '#d99320' : '#2a7d47';
+      L.circleMarker([p.lat, p.lng], { radius: 14, color: '#fff', weight: 3, fillColor: color, fillOpacity: 0.85 })
+        .addTo(state.map)
+        .bindPopup(`<strong>${p.name}</strong><br>${p.crop} · ${p.areaDa} dönüm<br>Nem: %${p.moisture}`);
+    });
+    db.sensors.forEach(s => {
+      L.circleMarker([s.lat, s.lng], { radius: 5, color: '#0a2316', weight: 1, fillColor: '#d4b85f', fillOpacity: 1 })
+        .addTo(state.map)
+        .bindTooltip(`${sensorMeta[s.type]?.label}: ${s.value}${s.unit}`);
+    });
+  },
+
+  finance: () => {
+    const cats = {};
+    db.expenses.forEach(e => { cats[e.category] = (cats[e.category]||0) + e.amount; });
+    const ctx1 = document.getElementById('expenseDonut');
+    if (ctx1) {
+      state.charts.donut = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(cats),
+          datasets: [{ data: Object.values(cats), backgroundColor: ['#2a7d47','#d4b85f','#3b9bc7','#8a6a3f','#c8473b','#6db585','#1e6238','#5a8a3f'], borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { font: { family: "'Inter'", size: 12 }, padding: 12 } } } }
+      });
+    }
+    const byParcel = {};
+    db.expenses.forEach(e => {
+      const p = db.parcels.find(x => x.id === e.parcelId);
+      if (!p) return;
+      byParcel[p.name] = (byParcel[p.name]||0) + e.amount;
+    });
+    const ctx2 = document.getElementById('parcelBar');
+    if (ctx2) {
+      state.charts.bar = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(byParcel),
+          datasets: [{ label: 'Maliyet (₺)', data: Object.values(byParcel), backgroundColor: '#2a7d47', borderRadius: 6 }]
+        },
+        options: { ...chartOptions('₺'), indexAxis: 'y', plugins: { legend: { display: false } } }
+      });
+    }
+  }
+};
+
+function chartOptions(unit) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { position: 'top', labels: { font: { family: "'Inter'", size: 11 }, color: '#455349', usePointStyle: true, padding: 10 } },
+      tooltip: { backgroundColor: '#0a2316', titleFont: { family: "'Inter'", weight: 600 }, bodyFont: { family: "'Inter'" }, padding: 10, cornerRadius: 8 }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 10 }, color: '#7a8580' } },
+      y: { grid: { color: '#e6e1d6' }, ticks: { font: { family: "'Inter'", size: 10 }, color: '#7a8580', callback: v => v + (unit||'') }, beginAtZero: false }
+    }
+  };
+}
+
+/* =========================================================
+   Etkileşim helpers
+   ========================================================= */
+function toggleTask(id) {
+  const t = db.tasks.find(x => x.id === id);
+  if (!t) return;
+  t.status = t.status === 'completed' ? 'planned' : 'completed';
+  if (t.status === 'completed') t.completedAt = new Date().toISOString().slice(0,10);
+  toast(`Görev ${t.status === 'completed' ? 'tamamlandı' : 'açıldı'}: ${t.title}`, 'success');
+  navigateTo('tasks');
+}
+
+function showParcelDetail(id) {
+  const p = db.parcels.find(x => x.id === id);
+  toast(`${p.name} detay ekranı yakında...`, 'success');
+}
+
+function showSensorChart(id) {
+  const s = db.sensors.find(x => x.id === id);
+  if (!s) return;
+  const meta = sensorMeta[s.type];
+  toast(`${meta.label} (${s.value}${s.unit}) — son 24 saat grafiği yakında`, 'success');
+}
+
+function taskStatusLabel(s) {
+  return { planned: 'Planlandı', in_progress: 'Devam ediyor', completed: 'Tamamlandı', overdue: 'Gecikti' }[s] || s;
+}
+function taskBadge(s) {
+  return { planned: 'muted', in_progress: 'info', completed: 'success', overdue: 'danger' }[s] || 'muted';
+}
+function priorityLabel(p) { return { low: 'Düşük', medium: 'Orta', high: 'Yüksek', urgent: 'Acil' }[p] || p; }
+function priorityBadge(p) { return { low: 'muted', medium: 'info', high: 'warn', urgent: 'danger' }[p] || 'muted'; }
+
+function formatDate(d) {
+  if (!d) return '—';
+  const date = new Date(d);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((date - today) / (1000*60*60*24));
+  if (diff === 0) return 'Bugün';
+  if (diff === 1) return 'Yarın';
+  if (diff === -1) return 'Dün';
+  return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+}
+
+function toast(msg, type='') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toastHost').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; }, 2400);
+  setTimeout(() => el.remove(), 2800);
+}
+
+/* =========================================================
+   Gerçek zamanlı sensör simülasyonu
+   ========================================================= */
+setInterval(() => {
+  if (!state.user) return;
+  db.sensors.forEach(s => {
+    const noise = (Math.random() - 0.5) * (s.value * 0.04);
+    s.value = Math.max(0, +(s.value + noise).toFixed(2));
+  });
+}, 8000);
+
+/* Enter ile login */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') {
+    login();
+  }
+});
+</script>
+</body>
+</html>
